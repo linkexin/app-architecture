@@ -11,15 +11,18 @@ protocol FolderViewControllerDelegate: class {
 class FolderViewController: UITableViewController {
 	weak var delegate: FolderViewControllerDelegate? = nil
 	
-	let viewModel = FolderViewModel()
+	let viewModel = FolderViewModel() // controller 持有 view-model
 	let disposeBag = DisposeBag()
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
+		// controller 将 view-model 和 view 绑定
 		viewModel.navigationTitle.bind(to: rx.title).disposed(by: disposeBag)
 		viewModel.folderContents.bind(to: tableView.rx.items(dataSource: dataSource)).disposed(by: disposeBag)
+		// 定义删除事件的后续操作：直接调 view-model
 		tableView.rx.modelDeleted(Item.self)
 			.subscribe(onNext: { [unowned self] in self.viewModel.deleteItem($0) }).disposed(by: disposeBag)
+		// 定义选择事件的后续操作：调 Coordinator 来进行页面跳转 or 播放录音
 		tableView.rx.modelSelected(Item.self)
 			.subscribe(onNext: { [unowned self] in self.delegate?.didSelect($0) }).disposed(by: disposeBag)
 	}

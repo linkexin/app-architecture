@@ -4,9 +4,10 @@ import RxCocoa
 import AVFoundation
 
 class PlayViewModel {
+	// model
 	let recording: Variable<Recording?> = Variable(nil)
 	let playState: Observable<Player.State?>
-	let togglePlay = PublishSubject<()>()
+	let togglePlay = PublishSubject<()>() // 订阅了这个对象后，会对观察者发送订阅后产生的元素，订阅前的不发送
 	let setProgress = PublishSubject<TimeInterval>()
 	
 
@@ -54,6 +55,7 @@ class PlayViewModel {
 		}.share(replay: 1)
 	}
 	
+	// controller 会调用的方法
 	func nameChanged(_ name: String?) {
 		guard let r = recording.value, let text = name else { return }
 		r.setName(text)
